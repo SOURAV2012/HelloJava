@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified" elementFormDefault="qualified">
+  <xs:element name="root" type="rootType"/>
+  <xs:complexType name="elementType">
+    <xs:sequence>
+      <xs:element type="xs:byte" name="parent"/>
+      <xs:element type="xs:byte" name="nodename"/>
+      <xs:element type="xs:string" name="value"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="rootType">
+    <xs:sequence>
+      <xs:element type="elementType" name="element" maxOccurs="unbounded" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>
