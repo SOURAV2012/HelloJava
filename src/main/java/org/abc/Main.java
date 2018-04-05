@@ -1,16 +1,19 @@
+
 package org.abc;
 
 import org.abc.utils.DemoUtils;
+import org.apache.log4j.Logger;
 import org.xml.sax.SAXException;
 
 public class Main {
 
+	final static Logger logger = Logger.getLogger(Main.class);
+
 	public static void main(String[] args) throws SAXException {
-		// TODO Auto-generated method stub
 
 		String s="<?xml version=\"1.0\" encoding=\"UTF-8\"?><root> <element> <parent>0</parent> <nodename>1</nodename> <value>This is the first node</value> </element></root>";
 		  
-		System.out.println(DemoUtils.validateXMLSchema(s));
+		logger.info(DemoUtils.validateXMLSchema(s));
 	}
 
 }

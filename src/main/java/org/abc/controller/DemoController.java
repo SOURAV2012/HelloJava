@@ -3,23 +3,31 @@ package org.abc.controller;
 import javax.xml.bind.JAXBException;
 
 import org.abc.service.DemoRestService;
-import org.abc.utils.DemoUtils; 
+import org.abc.utils.DemoUtils;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.xml.sax.SAXException;
 
 @RestController
+@RequestMapping("/process")
 public class DemoController {
+	
+	final static Logger logger = Logger.getLogger(DemoController.class);
+
 	
 	@Autowired
 	private DemoRestService demoRestService;
 	
 	
-	@GetMapping("/process")
-	public String getProcess(@RequestParam("input")String inputXml){
+	@PostMapping(value ="/events") 
+	public String getProcess(@RequestBody String inputXml){
 		String sessionId = RequestContextHolder.currentRequestAttributes().getSessionId();
 		String response = null;
 		try {
@@ -33,7 +41,6 @@ public class DemoController {
 		} catch (SAXException e) {
 			response =  "Exception :: is"+e.getMessage();
 		} catch (JAXBException e) {
-			// TODO Auto-generated catch block
 			response =  "Exception :: Some Exception Occured" ;
 		}
 		
@@ -48,7 +55,7 @@ public class DemoController {
 		try {
 			response = demoRestService.queryService(node, sessionId);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("The Error"+e);
 			response = "Exception :: "+e.getMessage();
 		}
 		return response;
