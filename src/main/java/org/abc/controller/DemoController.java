@@ -19,7 +19,7 @@ import org.xml.sax.SAXException;
 @RequestMapping("/process")
 public class DemoController {
 	
-	final static Logger logger = Logger.getLogger(DemoController.class);
+	 static final Logger logger = Logger.getLogger(DemoController.class);
 
 	
 	@Autowired
