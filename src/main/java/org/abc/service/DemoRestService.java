@@ -3,11 +3,13 @@ package org.abc.service;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.TreeMap;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -18,93 +20,116 @@ import org.abc.mapper.ElementType;
 import org.abc.mapper.ObjectFactory;
 import org.abc.mapper.RootType;
 import org.abc.utils.ApplicationConstant;
+import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
-
-
 
 @Service
 public class DemoRestService {
-	
-	private static Map<String,List<ElementType>> processResponseCache = new HashMap<String,List<ElementType>>();
-	
-	 Comparator<ElementType> elementComparator = Comparator.comparing(ElementType::getParent , (e1,e2) ->{
-														if(e1==e2)
-															return 0 ;
-														else if(e1>e2)
-															return 1;
-														else
-															return 0;
-												});
-	
-	public String processService(String input , String sessionId) throws JAXBException{
-		 List<ElementType> elementList = processXmlElements(input);
-		 processResponseCache.put(sessionId,elementList);
-		 return printIndented(elementList,0);
+
+	final static Logger logger = Logger.getLogger(DemoRestService.class);
+
+	private static Map<String, Map<Integer, List<ElementType>>> processResponseCache = new HashMap<String, Map<Integer, List<ElementType>>>();
+
+	Comparator<ElementType> elementComparatorParent = Comparator.comparing(ElementType::getParent, (e1, e2) -> {
+		if (e1 == e2)
+			return 0;
+		else if (e1 > e2)
+			return 1;
+		else
+			return -1;
+	});
+
+	Comparator<ElementType> elementComparatorNodename = Comparator.comparing(ElementType::getNodename, (e1, e2) -> {
+		if (e1 == e2)
+			return 0;
+		else if (e1 > e2)
+			return 1;
+		else
+			return -1;
+	});
+
+	public String processService(String input, String sessionId) throws JAXBException {
+		logger.debug("Inside processService()");
+		Map<Integer, List<ElementType>> elementMap = processXmlElements(input);
+		processResponseCache.put(sessionId, elementMap);
+		return printIndented(elementMap, 0);
 	}
-	
-	
-	public String queryService(Integer node , String sessionId) throws Exception{
-		
-		if(!sessionId.contains(sessionId)){
+
+	public String queryService(Integer startNode, String sessionId) throws Exception {
+		logger.debug("Inside queryService()");
+		if (!sessionId.contains(sessionId)) {
 			throw new Exception("Process Request not Found in the Session");
-		}	
-		
-		List<ElementType> elementList  = processResponseCache.get(sessionId);		
-		elementList =	elementList.stream()
-								    .filter(n -> (n.getParent() >= node && n.getParent() <= node+2))
-								    .sorted(elementComparator)
-								    .collect(Collectors.toList());
-		
-		return printIndented(elementList,node);
-		 
+		}
+		Map<Integer, List<ElementType>> elementMap = processResponseCache.get(sessionId);
+		return printIndented(elementMap, startNode);
 	}
-	
-	
-	private  List<ElementType> processXmlElements(String xmlElements) throws JAXBException{
-		 
+
+	private Map<Integer, List<ElementType>> processXmlElements(String xmlElements) throws JAXBException {
+
 		JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
 		Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-		InputStream stream = new ByteArrayInputStream(xmlElements.getBytes(StandardCharsets.UTF_8));		 
-		 RootType root = ((JAXBElement<RootType>)  jaxbUnmarshaller.unmarshal(stream)).getValue();;	
+		InputStream stream = new ByteArrayInputStream(xmlElements.getBytes(StandardCharsets.UTF_8));
+		RootType root = ((JAXBElement<RootType>) jaxbUnmarshaller.unmarshal(stream)).getValue();
 
-		 
-		 
-		 List<ElementType> elementList =    root.getElement()
-										 	 .stream()
-										 	 .sorted(elementComparator)
-										 	 .collect(Collectors.toList());
-		 
-		 
-		 return elementList;
-	}
-	
-	
-	private String printIndented(List<ElementType> elementList, int startNode){
-		
-		String indent = "";
-		StringBuilder responseBuilder = new StringBuilder()
-											.append(ApplicationConstant.HTML_TAG_OP)
-											.append(ApplicationConstant.HTML_TAG_P_OP)
-											.append(elementList.get(0).getParent())
-											.append(ApplicationConstant.HTML_TAG_P_CL);
-		int prevNode = -1;
-		for(ElementType element : elementList){
-			if(prevNode != element.getParent()){
-				indent = indent + ApplicationConstant.SPACE;
-				responseBuilder.append(ApplicationConstant.HTML_TAG_P_OP)
-								.append(indent)
-								.append(element.getNodename())
-								.append(ApplicationConstant.HTML_TAG_P_CL);
-			}else{
-				responseBuilder.append(ApplicationConstant.HTML_TAG_P_OP)
-								.append(indent)
-								.append(element.getNodename())
-								.append(ApplicationConstant.HTML_TAG_P_CL);
+		Map<Integer, List<ElementType>> elementMap = new TreeMap<Integer, List<ElementType>>();
+
+		root.getElement().stream().forEach(n -> {
+			if (elementMap.containsKey(n.getParent())) {
+				List eList = elementMap.get(n.getParent());
+				eList.add(n);
+				Collections.sort(eList, elementComparatorNodename);
+			} else {
+				List eList = new ArrayList<ElementType>();
+				eList.add(n);
+				elementMap.put(n.getParent(), eList);
 			}
-			prevNode = element.getParent();
+		});
+
+		return elementMap;
+	}
+
+	private static void print(Map<Integer, List<ElementType>> elementMap, int startNode, StringBuilder responseBuilder,
+			String indent, Integer initLevel, Integer finalLevel) {
+
+		if (initLevel > finalLevel) {
+			return;
 		}
-		responseBuilder.append(ApplicationConstant.HTML_TAG_CL);
-		return responseBuilder.toString();		
+
+		if (!elementMap.containsKey(startNode)) {
+			return;
+		}
+		List<ElementType> lst = elementMap.get(startNode);
+		indent = indent + ApplicationConstant.SPACE;
+
+		for (ElementType elmt : lst) {
+
+			if (elmt.getNodename() == startNode) {
+				continue;
+			}
+			responseBuilder.append(System.getProperty("line.separator")).append(indent).append(elmt.getNodename());
+
+			if (initLevel == -1) {
+				print(elementMap, elmt.getNodename(), responseBuilder, indent, initLevel, finalLevel);
+			} else {
+				print(elementMap, elmt.getNodename(), responseBuilder, indent, initLevel + 1, finalLevel);
+			}
+
+		}
+
+	}
+
+	private String printIndented(Map<Integer, List<ElementType>> elementMap, int startNode) {
+
+		Integer initLevel = 1;
+		Integer finalLevel = initLevel + 1; // for two level penetration
+
+		String indent = "";
+		StringBuilder responseBuilder = new StringBuilder();
+
+		responseBuilder.append(startNode);
+
+		print(elementMap, startNode, responseBuilder, indent, initLevel, finalLevel);
+		return responseBuilder.toString();
 	}
 
 }

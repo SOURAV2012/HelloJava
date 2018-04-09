@@ -43,8 +43,8 @@ import javax.xml.bind.annotation.XmlType;
 })
 public class ElementType {
 
-    protected byte parent;
-    protected byte nodename;
+    protected Integer parent;
+    protected Integer nodename;
     @XmlElement(required = true)
     protected String value;
 
@@ -52,7 +52,7 @@ public class ElementType {
      * Gets the value of the parent property.
      * 
      */
-    public byte getParent() {
+    public Integer getParent() {
         return parent;
     }
 
@@ -60,7 +60,7 @@ public class ElementType {
      * Sets the value of the parent property.
      * 
      */
-    public void setParent(byte value) {
+    public void setParent(Integer value) {
         this.parent = value;
     }
 
@@ -68,7 +68,7 @@ public class ElementType {
      * Gets the value of the nodename property.
      * 
      */
-    public byte getNodename() {
+    public Integer getNodename() {
         return nodename;
     }
 
@@ -76,7 +76,7 @@ public class ElementType {
      * Sets the value of the nodename property.
      * 
      */
-    public void setNodename(byte value) {
+    public void setNodename(Integer value) {
         this.nodename = value;
     }
 
