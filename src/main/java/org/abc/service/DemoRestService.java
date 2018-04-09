@@ -52,7 +52,7 @@ public class DemoRestService {
 		logger.debug("Inside processService()");
 		Map<Integer, List<ElementType>> elementMap = processXmlElements(input);
 		processResponseCache.put(sessionId, elementMap);
-		return printIndented(elementMap, 0);
+		return printIndented(elementMap, 0 ,-1);
 	}
 
 	public String queryService(Integer startNode, String sessionId) throws Exception {
@@ -61,7 +61,7 @@ public class DemoRestService {
 			throw new Exception("Process Request not Found in the Session");
 		}
 		Map<Integer, List<ElementType>> elementMap = processResponseCache.get(sessionId);
-		return printIndented(elementMap, startNode);
+		return printIndented(elementMap, startNode,1);
 	}
 
 	private Map<Integer, List<ElementType>> processXmlElements(String xmlElements) throws JAXBException {
@@ -118,9 +118,9 @@ public class DemoRestService {
 
 	}
 
-	private String printIndented(Map<Integer, List<ElementType>> elementMap, int startNode) {
+	private String printIndented(Map<Integer, List<ElementType>> elementMap, int startNode,Integer initLevel) {
 
-		Integer initLevel = 1;
+		
 		Integer finalLevel = initLevel + 1; // for two level penetration
 
 		String indent = "";
