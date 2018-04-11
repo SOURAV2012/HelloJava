@@ -3,8 +3,8 @@
   <xs:element name="root" type="rootType"/>
   <xs:complexType name="elementType">
     <xs:sequence>
-      <xs:element type="xs:integer" name="parent"/>
-      <xs:element type="xs:integer" name="nodename"/>
+      <xs:element type="xs:int" name="parent"/>
+      <xs:element type="xs:int" name="nodename"/>
       <xs:element type="xs:string" name="value"/>
     </xs:sequence>
   </xs:complexType>

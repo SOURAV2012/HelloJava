@@ -66,7 +66,27 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 		
-		
+<!-- 		changes -->
+		<plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>jaxb2-maven-plugin</artifactId>
+            <version>1.5</version>
+            <executions>
+                <execution>
+                    <id>id1</id>
+                    <goals>
+                        <goal>xjc</goal>
+                    </goals>
+                    <configuration>
+                        <outputDirectory>src/main/java</outputDirectory>
+                        <clearOutputDir>false</clearOutputDir>
+                        <packageName>org.abc.mapper</packageName>
+                        <schemaDirectory>src/main/resources/xsd</schemaDirectory>
+                        <schemaFiles>hierarchy.xsd</schemaFiles>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
        
         </plugins>
 	</build>

@@ -11,6 +11,7 @@ public class DemoRestApplicationTests {
 
 	@Test
 	public void contextLoads() {
+		assert(true);
 	}
 
 }

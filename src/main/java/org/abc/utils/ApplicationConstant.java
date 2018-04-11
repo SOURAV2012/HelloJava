@@ -1,9 +1,7 @@
 package org.abc.utils;
 
-public class ApplicationConstant {
+public interface ApplicationConstant {
 	
-	private ApplicationConstant() {
-	}
 	public static final String SPACE = "   ";
 	public static final String HTML_TAG_OP = "<html>";
 	public static final String HTML_TAG_CL = "</html>";
