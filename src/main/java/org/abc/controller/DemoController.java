@@ -22,7 +22,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 @RequestMapping("/process")
 public class DemoController {
 
-	final static Logger logger = Logger.getLogger(DemoController.class);
+	static final  Logger logger = Logger.getLogger(DemoController.class);
 
 	@Autowired
 	private DemoRestService demoRestService;

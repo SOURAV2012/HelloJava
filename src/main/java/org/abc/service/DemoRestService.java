@@ -1,7 +1,6 @@
 package org.abc.service;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -12,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import javax.websocket.SessionException;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -56,15 +56,16 @@ public class DemoRestService {
 		return printIndented(elementMap, 0 ,-1);
 	}
 
-	public String queryService(Integer startNode, String sessionId) throws Exception {
+	public String queryService(Integer startNode, String sessionId) throws SessionException {
 		logger.debug("Inside queryService()");
 		if (!sessionId.contains(sessionId)) {
-			throw new Exception("Process Request not Found in the Session");
+			throw new SessionException("Process Request not Found in the Session", null, null);
 		}
 		Map<Integer, List<ElementType>> elementMap = processResponseCache.get(sessionId);
 		return printIndented(elementMap, startNode,1);
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private Map<Integer, List<ElementType>> processXmlElements(String xmlElements) throws JAXBException {
 
 		JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);

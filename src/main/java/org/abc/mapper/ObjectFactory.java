@@ -31,14 +31,13 @@ import javax.xml.namespace.QName;
 @XmlRegistry
 public class ObjectFactory {
 
-    private final static QName _Root_QNAME = new QName("", "root");
+    private static final  QName _Root_QNAME = new QName("", "root");
 
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: org.abc.mapper
      * 
      */
-    public ObjectFactory() {
-    }
+    
 
     /**
      * Create an instance of {@link RootType }
@@ -62,7 +61,7 @@ public class ObjectFactory {
      */
     @XmlElementDecl(namespace = "", name = "root")
     public JAXBElement<RootType> createRoot(RootType value) {
-        return new JAXBElement<RootType>(_Root_QNAME, RootType.class, null, value);
+        return new JAXBElement<>(_Root_QNAME, RootType.class, null, value);
     }
 
 }
