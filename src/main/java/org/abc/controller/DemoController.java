@@ -38,7 +38,7 @@ public class DemoController {
 		try {
 				response = demoRestService.processService(inputXml, sessionId);
 		} catch (JAXBException e) {
-			response = "Exception :: Some Exception Occured";
+			response = "Exception :: JAXBException Occured, please check your format"+e.getStackTrace().toString();
 		}
 
 		return response;
